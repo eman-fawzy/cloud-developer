@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import {filterImageFromURL, deleteAllLocalFiles} from './util/util';
 
 (async () => {
 
@@ -28,6 +28,23 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
+
+  app.get("/filteredimage", async (req, res) => {
+    let { image_url } = req.query;
+    if (!image_url) {
+      return res.status(400).send("image_url is required");
+    }
+
+    try {
+      const image = await filterImageFromURL(image_url);
+      res.status(200).sendFile(image);
+    } catch (error) {
+      console.error(error);
+      res.status(422).send("Invalid MIME type");
+    } finally {
+      deleteAllLocalFiles();
+    }
+  });
 
   //! END @TODO1
   
