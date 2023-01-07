@@ -29,30 +29,37 @@ import {filterImageFromURL, deleteAllLocalFiles} from './util/util';
 
   /**************************************************************************** */
 
-  app.get("/filteredimage", async (req, res) => {
-    let { image_url } = req.query;
-    if (!image_url) {
-      return res.status(400).send("image_url is required");
-    }
+  app.get(
+    "/filteredimage",
+    async (req: express.Request, res: express.Response): Promise<void> => {
+      let { image_url } = req.query;
+      if (!image_url) {
+        res.status(400).send("image_url is required");
+        return;
+      }
 
-    try {
-      const image = await filterImageFromURL(image_url);
-      res.status(200).sendFile(image);
-    } catch (error) {
-      console.error(error);
-      res.status(422).send("Invalid MIME type");
-    } finally {
-      deleteAllLocalFiles();
+      try {
+        const image: string = await filterImageFromURL(image_url);
+        res.status(200).sendFile(image);
+      } catch (error: unknown) {
+        console.error(error);
+        res.status(422).send("Invalid MIME type");
+      } finally {
+        deleteAllLocalFiles();
+      }
     }
-  });
+  );
 
   //! END @TODO1
   
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
-    res.send("try GET /filteredimage?image_url={{}}")
-  } );
+  app.get(
+    "/",
+    async (req: express.Request, res: express.Response): Promise<void> => {
+      res.send("try GET /filteredimage?image_url={{}}");
+    }
+  );
   
 
   // Start the Server
