@@ -9,39 +9,42 @@ import Jimp = require("jimp");
 // RETURNS
 //    an absolute path to a filtered image locally saved file
 export async function filterImageFromURL(inputURL: string): Promise<string> {
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async (resolve, reject): Promise<void> => {
     try {
       const photo = await Jimp.read(inputURL);
       const outpath =
         "/tmp/filtered." + Math.floor(Math.random() * 2000) + ".jpg";
-      await photo
+      photo
         .resize(256, 256) // resize
         .quality(60) // set JPEG quality
         .greyscale() // set greyscale
         .write(__dirname + outpath, (img) => {
           resolve(__dirname + outpath);
         });
-    } catch (error) {
+    } catch (error: unknown) {
       reject(error);
     }
   });
 }
 
 
-export async function deleteAllLocalFiles() {
-  const path = __dirname + "/tmp/";
-  fs.readdir(path, (err, filesNameList) => {
-    if (err) {
-      console.error(err);
-      return;
+export async function deleteAllLocalFiles(): Promise<void> {
+  const path: string = __dirname + "/tmp/";
+  fs.readdir(
+    path,
+    (err: NodeJS.ErrnoException, filesNameList: string[]): void => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      if (filesNameList.length) {
+        let filesPathList: Array<string> = filesNameList.map(
+          (fileName: string) => path + fileName
+        );
+        deleteLocalFiles(filesPathList);
+      }
     }
-    if (filesNameList.length) {
-      let filesPathList: Array<string> = filesNameList.map(
-        (fileName) => path + fileName
-      );
-      deleteLocalFiles(filesPathList);
-    }
-  });
+  );
 }
 
 // deleteLocalFiles
@@ -49,7 +52,7 @@ export async function deleteAllLocalFiles() {
 // useful to cleanup after tasks
 // INPUTS
 //    files: Array<string> an array of absolute paths to files
-export async function deleteLocalFiles(files: Array<string>) {
+export async function deleteLocalFiles(files: Array<string>): Promise<void> {
   for (let file of files) {
     fs.unlinkSync(file);
   }
