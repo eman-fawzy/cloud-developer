@@ -41,7 +41,7 @@ import {filterImageFromURL, deleteAllLocalFiles} from './util/util';
       try {
         const image: string = await filterImageFromURL(image_url);
         res.status(200).sendFile(image);
-      } catch (error: unknown) {
+      } catch (error) {
         console.error(error);
         res.status(422).send("Invalid MIME type");
       } finally {
